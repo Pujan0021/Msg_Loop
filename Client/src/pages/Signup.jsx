@@ -1,6 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    if (!fullName || !email || !password) {
+      toast.error("All fields are required!");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/signup",
+        {
+          fullName,
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        },
+      );
+      if (response.data.success) {
+        toast.success("SignUp successfull");
+        navigate("/login");
+      }
+    } catch (error) {
+      toast.error("Error Occured in signup", error);
+    }
+  };
   return (
     <>
       <div className="flex justify-center items-center h-screen font-orbitron flex-col space-y-5">
@@ -13,15 +46,17 @@ const Signup = () => {
               Signup
             </h2>
             <div>
-              <form className="mt-3 p-5 ">
+              <form onSubmit={handleSignUp} className="mt-3 p-3 ">
                 <label className="block" htmlFor="fullname">
                   Full Name
                 </label>
                 <input
                   type="text"
-                  name="email"
+                  name="fullname"
                   placeholder="Enter your fullname"
                   className="border text-[14px] mt-2 px-1.5 w-50 rounded-md"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                 />
                 <label className="block mt-3" htmlFor="email">
                   Email
@@ -31,6 +66,8 @@ const Signup = () => {
                   name="email"
                   placeholder="Enter your email"
                   className="border text-[14px] px-1.5 w-50 rounded-md  mt-2"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <label className="block mt-3" htmlFor="password">
                   Password
@@ -40,6 +77,8 @@ const Signup = () => {
                   name="password"
                   placeholder="Enter your password"
                   className="border text-[14px] px-1.5 w-50 rounded-md"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <div className="text-center mt-6">
                   <button
@@ -52,7 +91,9 @@ const Signup = () => {
               </form>
               <p className="text-sm text-center mb-5">
                 Already have an account?{" "}
-                <span className="underline">Login</span>
+                <Link to="/login" className="underline">
+                  Log in
+                </Link>
               </p>
             </div>
           </div>
